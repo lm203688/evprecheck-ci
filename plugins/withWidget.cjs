@@ -66,6 +66,7 @@ const WIDGET_INFO_PLIST = `<?xml version="1.0" encoding="UTF-8"?>
 `;
 
 function copySources(config, appGroup) {
+  const noGroup = process.env.EVPRECHECK_NO_APP_GROUP === '1';
   return withDangerousMod(config, [
     'ios',
     async (cfg) => {
@@ -77,14 +78,20 @@ function copySources(config, appGroup) {
       for (const f of fs.readdirSync(srcDir)) {
         if (f.endsWith('.swift')) fs.copyFileSync(path.join(srcDir, f), path.join(dstDir, f));
       }
-      const entitlements = entitlementsXml(appGroup);
       fs.writeFileSync(path.join(dstDir, `${TARGET_NAME}-Info.plist`), WIDGET_INFO_PLIST);
-      fs.writeFileSync(path.join(dstDir, `${TARGET_NAME}.entitlements`), entitlements);
-
-      const appName = cfg.modRequest.projectName || 'EVPrecheck';
-      const appDir = path.join(iosDir, appName);
-      if (fs.existsSync(appDir)) {
-        fs.writeFileSync(path.join(appDir, `${appName}.entitlements`), entitlements);
+      // Without a registered App Group on the portal, writing the entitlement makes
+      // export fail with a profile mismatch. The flag builds a compile-checkable
+      // app; the widget then shows its empty state instead of the last verdict.
+      if (!noGroup) {
+        const entitlements = entitlementsXml(appGroup);
+        fs.writeFileSync(path.join(dstDir, `${TARGET_NAME}.entitlements`), entitlements);
+        const appName = cfg.modRequest.projectName || 'EVPrecheck';
+        const appDir = path.join(iosDir, appName);
+        if (fs.existsSync(appDir)) {
+          fs.writeFileSync(path.join(appDir, `${appName}.entitlements`), entitlements);
+        }
+      } else {
+        console.warn('[withWidget] EVPRECHECK_NO_APP_GROUP=1 -> no App Group entitlements');
       }
       return cfg;
     },
@@ -130,9 +137,10 @@ module.exports = function withWidget(config) {
       console.warn(`[withWidget] expected 1 swift file, got ${widgets.join(', ')}`);
     }
 
+    const noGroup = process.env.EVPRECHECK_NO_APP_GROUP === '1';
     eachBuildSetting(proj, targetUuid, (bs) => {
       Object.assign(bs, {
-        CODE_SIGN_ENTITLEMENTS: `"${TARGET_NAME}/${TARGET_NAME}.entitlements"`,
+        ...(noGroup ? {} : { CODE_SIGN_ENTITLEMENTS: `"${TARGET_NAME}/${TARGET_NAME}.entitlements"` }),
         CURRENT_PROJECT_VERSION: `"${buildNumber}"`,
         GENERATE_INFOPLIST_FILE: 'NO',
         INFOPLIST_FILE: `"${TARGET_NAME}/${TARGET_NAME}-Info.plist"`,
@@ -156,7 +164,7 @@ module.exports = function withWidget(config) {
     });
 
     eachBuildSetting(proj, appTarget.uuid, (bs) => {
-      bs.CODE_SIGN_ENTITLEMENTS = `"${appName}/${appName}.entitlements"`;
+      if (!noGroup) bs.CODE_SIGN_ENTITLEMENTS = `"${appName}/${appName}.entitlements"`;
       if (profileMain) {
         Object.assign(bs, {
           CODE_SIGN_STYLE: 'Manual',
