@@ -78,9 +78,6 @@ jobs:
           EVPRECHECK_TEAM_ID: ${{ vars.EVPRECHECK_TEAM_ID }}
           EVPRECHECK_PROFILE_MAIN: ${{ secrets.PROFILE_MAIN_NAME }}
           EVPRECHECK_PROFILE_WIDGET: ${{ secrets.PROFILE_WIDGET_NAME }}
-          # App Group not registered on the portal yet: build 1 validates the whole pipeline.
-          # Remove this line once group.com.lixing.evprecheck exists and profiles carry it.
-          EVPRECHECK_NO_APP_GROUP: '1'
         run: npx expo prebuild --platform ios --clean --non-interactive
 
       - name: Archive
