@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "EVPrecheck",
+    "slug": "evprecheck",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "description": "A 12-point EV inspection you can run without an OBD dongle. One purchase, no account, no ads, no subscription.",
+    "assetBundlePatterns": ["**/*"],
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "com.lixing.evprecheck",
+      "icon": "./assets/icon.png",
+      "supportsTablet": true,
+      "deploymentTarget": "16.4",
+      "buildNumber": "1",
+      "config": { "usesNonExemptEncryption": false },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIRequiredDeviceCapabilities": ["arm64"],
+        "NSCameraUsageDescription": "EVPrecheck reads your VIN and charging receipts on device. Photos never leave the phone."
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": ["0A2A.1", "3B52.1", "C617.1"]
+          }
+        ]
+      }
+    },
+    "plugins": [
+      "./plugins/withUIScene.cjs",
+      "./plugins/withAppIntents.cjs",
+      "./plugins/withWidget.cjs"
+    ],
+    "owner": "lm203688"
+  }
+}
