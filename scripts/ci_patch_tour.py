@@ -41,7 +41,7 @@ APP_TOUR = """
         if (!alive) return;
         s = await store.addCharge(s, { ...charges[i], vehicleId: vid });
         setState(s);
-        await wait(1200);
+        await wait(1700);
       }
       for (let i = 0; i < 3; i += 1) {
         if (!alive) return;
@@ -60,15 +60,16 @@ APP_TOUR = """
       if (!alive) return;
       s = await store.addReading(s, { type: 'aux', value: '12.4', vehicleId: vid });
       setState(s);
-      await wait(1200);
+      await wait(1700);
       if (!alive) return;
       setTab('check');
-      await wait(6000);
+      await wait(9000);
       if (!alive) return;
       setTab('garage');
-      await wait(5000);
+      await wait(7000);
       if (!alive) return;
       setTab('report');
+      await wait(8000);
     })();
     return () => {
       alive = false;
@@ -92,4 +93,6 @@ def patch():
 
 if __name__ == "__main__":
     patch()
+
+
 
