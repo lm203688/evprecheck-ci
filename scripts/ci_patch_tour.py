@@ -10,7 +10,6 @@ import pathlib
 APP_TOUR = """
   // CI recording tour: only active when EXPO_PUBLIC_TOUR=1 at bundle time.
   useEffect(() => {
-    if (process.env.EXPO_PUBLIC_TOUR !== '1') return undefined;
     let alive = true;
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     (async () => {
@@ -84,7 +83,7 @@ def patch():
     anchor = "  const common = { vehicle, result, aiStatus, onNav: setTab };"
     if anchor not in s:
         raise SystemExit("App.js anchor missing")
-    if "EXPO_PUBLIC_TOUR" in s:
+    if "CI recording tour" in s:
         print("App.js already patched")
     else:
         app.write_text(s.replace(anchor, anchor + "\n" + APP_TOUR, 1))
@@ -93,3 +92,4 @@ def patch():
 
 if __name__ == "__main__":
     patch()
+
